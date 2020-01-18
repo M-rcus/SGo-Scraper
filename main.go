@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
+	"regexp"
 
 	"github.com/joho/godotenv"
 )
@@ -11,7 +13,9 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		// `.env` file isn't required, at least if the
+		// environment variables are set elsewhere
+		fmt.Println(err)
 	}
 
 	downloadsDir := os.Getenv("DOWNLOADSDIR")
@@ -26,14 +30,22 @@ func main() {
 	fmt.Println("Found", albumName, "set from", modelName, "!")
 	fmt.Println("Found", len(imagesFound), "images in set. Downloading...")
 
-	albumDir := downloadsDir + "/" + modelName + " - " + albumName
+	replaceSpace := regexp.MustCompile(`\s+`)
+	albumDir := replaceSpace.ReplaceAllString(strings.TrimSpace(downloadsDir + "/" + modelName + " - " + albumName), " ")
 
 	checkAndCreateDir(downloadsDir)
 	checkAndCreateDir(albumDir)
 	imagesDownloaded := []string{}
 
 	for i, imageURL := range imagesFound {
-		imageOutput := albumDir + "/" + leftPad(strconv.Itoa(i), "0", digitsLen(len(imagesFound))-1) + ".jpg"
+		pad := ""
+
+		if i <= 10 {
+			pad = "0"
+		}
+		
+		filename := leftPad(strconv.Itoa(i + 1), pad, digitsLen(len(imagesFound))-1) + ".jpg"
+		imageOutput := albumDir + "/" + filename
 		fmt.Println(imageURL + " -> " + imageOutput)
 		imagesDownloaded = append(imagesDownloaded, imageOutput)
 

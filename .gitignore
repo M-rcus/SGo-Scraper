@@ -1,2 +1,4 @@
 downloads
 SGo-Scraper
+.env*
+!.env.example
