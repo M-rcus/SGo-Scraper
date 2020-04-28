@@ -31,6 +31,7 @@ func main() {
 	fmt.Println("Found", len(imagesFound), "images in set. Downloading...")
 
 	replaceSpace := regexp.MustCompile(`\s+`)
+	albumWithModelName := replaceSpace.ReplaceAllString(strings.TrimSpace(modelName + " - " + albumName), " ")
 	albumDir := replaceSpace.ReplaceAllString(strings.TrimSpace(downloadsDir + "/" + modelName + " - " + albumName), " ")
 
 	checkAndCreateDir(downloadsDir)
@@ -40,7 +41,7 @@ func main() {
 	for i, imageURL := range imagesFound {
 		pad := ""
 
-		if i <= 10 {
+		if i < 9 {
 			pad = "0"
 		}
 		
@@ -54,7 +55,7 @@ func main() {
 	}
 
 	if finalizeWithZip {
-		err := ZipFiles(albumDir+"/"+albumName+".zip", imagesDownloaded)
+		err := ZipFiles(albumDir+"/"+albumWithModelName+".zip", imagesDownloaded)
 		if err != nil {
 			panic(err)
 		}
